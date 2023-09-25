@@ -12,7 +12,7 @@ switch (animal) {
 ```
 The break is added as a default.
 Here is an example if you don't want to break (example taken from MDN):
-```
+```javascript
 switch (foo) {
   case 0:> output += "So ";
   case 1:> output += "What Is";
