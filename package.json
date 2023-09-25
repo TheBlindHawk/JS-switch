@@ -1,0 +1,45 @@
+{
+  "name": "@theblindhawk/js-switch",
+  "version": "1.0.0",
+  "description": "a custom switch-case compiler for javascript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "devDependencies": {
+    "@babel/preset-env": "^7.19.4",
+    "@types/node": "^20.4.7",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.0.1"
+  },
+  "scripts": {
+    "fix": "run-s fix:*",
+    "fix:prettier": "prettier -w",
+    "fix:eslint": "npm run lint:eslint --fix",
+    "build": "pegjs -o dist/index.js src/index.pegjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheBlindHawk/JS-switch.git"
+  },
+  "keywords": [
+    "switch-case",
+    "switch",
+    "compiler"
+  ],
+  "author": "TheBlindHawk",
+  "license": "ISC",
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/TheBlindHawk/Roulette/issues"
+  },
+  "homepage": "https://github.com/TheBlindHawk/Roulette#readme",
+  "dependencies": {
+    "pegjs": "^0.10.0"
+  }
+}
