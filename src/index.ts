@@ -1,8 +1,27 @@
-// @ts-ignore - 生成されたパーサーに型定義がないため
+/**
+ * HawkTS - Enhanced TypeScript Syntax
+ *
+ * A collection of syntax transforms for TypeScript:
+ * - switch: Multi-value cases, auto-break, fall-through operator
+ * - (more coming soon)
+ */
+
+// Core transformer
+export { transform, needsTransform, getEnabledTransforms, getApplicableTransforms } from './core/transformer';
+
+// Types and config
+export { Transform, HawkTSConfig, defaultConfig } from './core/types';
+
+// Individual transforms
+export { switchTransform, transformSwitch, testSwitch } from './transforms';
+
+// Legacy PEG.js parser (for runtime parsing)
+// @ts-ignore - generated parser has no types
 import * as parser from './parser-generated';
 
 /**
- * カスタムswitch構文をパースして標準JavaScriptに変換
+ * Parse custom switch syntax using PEG.js (runtime)
+ * @deprecated Use transform() for build-time transformation
  */
 export function parseSwitch(input: string): string {
   try {
@@ -21,31 +40,20 @@ export function parseSwitch(input: string): string {
 }
 
 /**
- * カスタムswitch構文をパースして実行可能な関数として返す
+ * Compile switch to executable function (runtime)
+ * @deprecated Use transform() for build-time transformation
  */
 export function compileSwitchToFunction<T = any>(
   input: string,
   paramName: string = 'value'
 ): (value: any) => T {
   const parsed = parseSwitch(input);
-  // 'switch(value)' を 'switch(${paramName})' に置換
   const code = parsed.replace(/switch\((\w+)\)/, `switch(${paramName})`);
-  
-  // Functionコンストラクタで関数を生成
   return new Function(paramName, code) as (value: any) => T;
 }
 
 /**
- * ファイルを読み込んでパース
- */
-export async function parseSwitchFile(filePath: string): Promise<string> {
-  const fs = await import('fs/promises');
-  const content = await fs.readFile(filePath, 'utf-8');
-  return parseSwitch(content);
-}
-
-/**
- * パースエラー
+ * Parse error with location information
  */
 export class ParseError extends Error {
   constructor(
@@ -53,19 +61,14 @@ export class ParseError extends Error {
     public line?: number,
     public column?: number
   ) {
-    super(
-      line && column 
-        ? `${message} at line ${line}, column ${column}`
-        : message
-    );
+    super(line && column ? `${message} at line ${line}, column ${column}` : message);
     this.name = 'ParseError';
   }
 }
 
-// デフォルトエクスポート
+// Default export for convenience
 export default {
+  transform: require('./core/transformer').transform,
   parseSwitch,
-  compileSwitchToFunction,
-  parseSwitchFile,
-  ParseError
+  ParseError,
 };

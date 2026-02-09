@@ -1,10 +1,11 @@
 {
-  "name": "hawkts-switch",
+  "name": "hawkts",
   "version": "1.0.0",
-  "description": "Hawk TypeScript (.hts) - Enhanced switch syntax with multi-value cases and auto-break",
+  "description": "HawkTS - Enhanced TypeScript syntax with multi-value switch cases, auto-break, and more",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
+    "hawkts": "./bin/hawkts.js",
     "hawkts-switch": "./bin/hawkts-switch.js"
   },
   "exports": {
@@ -12,9 +13,13 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./transformer": {
-      "types": "./dist/transformer.d.ts",
-      "default": "./dist/transformer.js"
+    "./transform": {
+      "types": "./dist/core/transformer.d.ts",
+      "default": "./dist/core/transformer.js"
+    },
+    "./transforms/switch": {
+      "types": "./dist/transforms/switch.d.ts",
+      "default": "./dist/transforms/switch.js"
     },
     "./ts-plugin": {
       "types": "./ts-plugin/dist/index.d.ts",
@@ -42,9 +47,11 @@
     "switch",
     "pattern-matching",
     "hts",
+    "hawkts",
     "hawk-typescript",
     "multi-case",
-    "syntax-extension"
+    "syntax-extension",
+    "transpiler"
   ],
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -55,16 +62,16 @@
     "ts-jest": "^29.0.0",
     "ts-node": "^10.9.0"
   },
-"author": "TheBlindHawk",
+  "author": "TheBlindHawk",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TheBlindHawk/JS-switch.git"
+    "url": "git+https://github.com/TheBlindHawk/hawkts.git"
   },
   "bugs": {
-    "url": "https://github.com/TheBlindHawk/JS-switch/issues"
+    "url": "https://github.com/TheBlindHawk/hawkts/issues"
   },
-  "homepage": "https://github.com/TheBlindHawk/JS-switch#readme",
+  "homepage": "https://github.com/TheBlindHawk/hawkts#readme",
   "dependencies": {
     "pegjs": "^0.10.0"
   }

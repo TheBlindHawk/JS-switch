@@ -1,12 +1,37 @@
 /**
- * Switch syntax transformer
- * Transforms custom switch syntax to valid TypeScript/JavaScript
+ * Switch Transform
+ * Enhanced switch syntax with multi-value cases and auto-break
+ *
+ * Features:
+ * - Multi-value cases: 'dog', 'puppy': action
+ * - Auto-break: no need to write break;
+ * - Fall-through operator: :>
  */
+
+import { Transform } from '../core/types';
+
+/**
+ * Check if source might contain custom switch syntax
+ */
+function testSwitch(source: string): boolean {
+  // Look for patterns like: 'value', 'value': or value, value:
+  const multiCasePattern = /switch\s*\([^)]+\)\s*\{[^}]*(?:'[^']*'|"[^"]*"|\d+)\s*,\s*(?:'[^']*'|"[^"]*"|\d+)/;
+  // Fall-through operator
+  const fallThroughPattern = /:>/;
+  // Case without 'case' keyword
+  const caseWithoutKeyword = /switch\s*\([^)]+\)\s*\{[^}]*\n\s*(?:'[^']*'|"[^"]*"|\d+)\s*:/;
+
+  return (
+    multiCasePattern.test(source) ||
+    fallThroughPattern.test(source) ||
+    caseWithoutKeyword.test(source)
+  );
+}
 
 /**
  * Transform custom switch syntax to valid TypeScript
  */
-export function transformCustomSwitch(source: string): string {
+function transformSwitch(source: string): string {
   let result = source;
   const switchPattern = /switch\s*\(([^)]+)\)\s*\{/g;
 
@@ -36,6 +61,7 @@ export function transformCustomSwitch(source: string): string {
     }
   }
 
+  // Apply transformations in reverse order to preserve positions
   for (let i = switches.length - 1; i >= 0; i--) {
     const { start, end, transformed } = switches[i];
     result = result.substring(0, start) + transformed + result.substring(end);
@@ -47,13 +73,18 @@ export function transformCustomSwitch(source: string): string {
 /**
  * Check if switch body uses custom syntax
  */
-export function needsTransformation(body: string): boolean {
+function needsTransformation(body: string): boolean {
   if (/:>/.test(body)) return true;
 
   const lines = body.split('\n');
   for (const line of lines) {
     const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('default') || trimmed.startsWith('case ') || trimmed.startsWith('//')) {
+    if (
+      !trimmed ||
+      trimmed.startsWith('default') ||
+      trimmed.startsWith('case ') ||
+      trimmed.startsWith('//')
+    ) {
       continue;
     }
     if (/^(?:'[^']*'|"[^"]*"|`[^`]*`|\d+)\s*[,:]/.test(trimmed)) {
@@ -107,7 +138,9 @@ function transformSwitchBody(body: string): string {
       continue;
     }
 
-    const caseMatch = trimmed.match(/^((?:(?:'[^']*'|"[^"]*"|`[^`]*`|\d+)\s*,\s*)*(?:'[^']*'|"[^"]*"|`[^`]*`|\d+))\s*(:>?)\s*(.*)/);
+    const caseMatch = trimmed.match(
+      /^((?:(?:'[^']*'|"[^"]*"|`[^`]*`|\d+)\s*,\s*)*(?:'[^']*'|"[^"]*"|`[^`]*`|\d+))\s*(:>?)\s*(.*)/
+    );
 
     if (caseMatch) {
       const values = caseMatch[1];
@@ -177,7 +210,10 @@ function parseValues(valuesStr: string): string[] {
   return values;
 }
 
-function collectCaseBody(lines: string[], startIndex: number): { lines: string[]; nextIndex: number } {
+function collectCaseBody(
+  lines: string[],
+  startIndex: number
+): { lines: string[]; nextIndex: number } {
   const bodyLines: string[] = [];
   let i = startIndex;
 
@@ -185,9 +221,11 @@ function collectCaseBody(lines: string[], startIndex: number): { lines: string[]
     const line = lines[i];
     const trimmed = line.trim();
 
-    if (trimmed.startsWith('case ') ||
-        trimmed.startsWith('default') ||
-        /^(?:'[^']*'|"[^"]*"|`[^`]*`|\d+)\s*[,:]/.test(trimmed)) {
+    if (
+      trimmed.startsWith('case ') ||
+      trimmed.startsWith('default') ||
+      /^(?:'[^']*'|"[^"]*"|`[^`]*`|\d+)\s*[,:]/.test(trimmed)
+    ) {
       break;
     }
 
@@ -201,3 +239,16 @@ function collectCaseBody(lines: string[], startIndex: number): { lines: string[]
 
   return { lines: bodyLines, nextIndex: i };
 }
+
+/**
+ * Switch transform definition
+ */
+export const switchTransform: Transform = {
+  name: 'switch',
+  description: 'Enhanced switch syntax with multi-value cases and auto-break',
+  test: testSwitch,
+  transform: transformSwitch,
+};
+
+// Also export individual functions for direct use
+export { transformSwitch, testSwitch, needsTransformation };

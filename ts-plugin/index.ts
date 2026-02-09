@@ -2,12 +2,12 @@ import type * as tslib from 'typescript/lib/tsserverlibrary';
 
 // Import transformer from main package
 // Path is relative from ts-plugin/dist/ to dist/
-const { transformCustomSwitch } = require('../../dist/transformer');
+const { transform, needsTransform } = require('../../dist/core/transformer');
 
 /**
- * TypeScript Language Service Plugin for hawkts-switch
+ * TypeScript Language Service Plugin for HawkTS
  *
- * This plugin intercepts source files and transforms custom switch syntax
+ * This plugin intercepts source files and transforms custom syntax
  * to valid TypeScript before the compiler sees it.
  */
 
@@ -16,7 +16,7 @@ function init(modules: { typescript: typeof tslib }): tslib.server.PluginModule 
 
   function create(info: tslib.server.PluginCreateInfo): tslib.LanguageService {
     const logger = info.project.projectService.logger;
-    logger.info('hawkts-switch plugin loaded');
+    logger.info('HawkTS plugin loaded');
 
     // Get the original language service
     const languageService = info.languageService;
@@ -48,18 +48,18 @@ function init(modules: { typescript: typeof tslib }): tslib.server.PluginModule 
 
       const originalText = original.getText(0, original.getLength());
 
-      // Check if file contains custom switch syntax
-      if (!containsCustomSwitch(originalText)) {
+      // Check if file needs transformation
+      if (!needsTransform(originalText)) {
         return original;
       }
 
       try {
-        const transformedText = transformCustomSwitch(originalText);
-        logger.info(`hawkts-switch: Transformed ${fileName}`);
+        const transformedText = transform(originalText);
+        logger.info(`HawkTS: Transformed ${fileName}`);
 
         return ts.ScriptSnapshot.fromString(transformedText);
       } catch (error) {
-        logger.info(`hawkts-switch: Error transforming ${fileName}: ${error}`);
+        logger.info(`HawkTS: Error transforming ${fileName}: ${error}`);
         return original;
       }
     };
@@ -68,21 +68,6 @@ function init(modules: { typescript: typeof tslib }): tslib.server.PluginModule 
   }
 
   return { create };
-}
-
-/**
- * Quick check if source might contain custom switch syntax
- */
-function containsCustomSwitch(source: string): boolean {
-  // Look for patterns like: 'value', 'value': or value, value:
-  // Also look for :> (fall-through operator)
-  const multiCasePattern = /switch\s*\([^)]+\)\s*\{[^}]*(?:'[^']*'|"[^"]*"|\d+)\s*,\s*(?:'[^']*'|"[^"]*"|\d+)/;
-  const fallThroughPattern = /:>/;
-  const caseWithoutKeyword = /switch\s*\([^)]+\)\s*\{[^}]*\n\s*(?:'[^']*'|"[^"]*"|\d+)\s*:/;
-
-  return multiCasePattern.test(source) ||
-         fallThroughPattern.test(source) ||
-         caseWithoutKeyword.test(source);
 }
 
 export = init;

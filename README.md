@@ -1,56 +1,27 @@
-# Hawk TypeScript (.hts)
+# HawkTS
 
-Enhanced switch-case syntax for TypeScript with multi-value support and auto-break.
+Enhanced TypeScript syntax with modular transforms.
 
 ## Features
 
+### Switch Transform (included)
 - **Multi-value cases**: `'dog', 'puppy': action`
 - **Auto-break**: No need to write `break;`
-- **Optional fall-through**: Use `:>` to continue to next case
-- **Full TypeScript support**: All TS features work normally
-- **VSCode Extension**: Syntax highlighting included
+- **Fall-through operator**: Use `:>` to continue to next case
+
+### Coming Soon
+- Pipe operator: `value |> fn1 |> fn2`
+- Pattern matching: `match value { ... }`
 
 ## Installation
 
 ```bash
-npm install hawkts-switch
+npm install hawkts
 ```
 
-## Setup
+## Quick Start
 
-### 1. Install VSCode Extension
-
-The VSCode extension provides syntax highlighting for `.hts` files:
-
-```bash
-cd node_modules/hawkts-switch/vscode-extension
-npx vsce package
-# Then install the .vsix file in VSCode
-```
-
-Or install from the VSCode marketplace (coming soon).
-
-### 2. Configure Build
-
-Update your `package.json`:
-
-```json
-{
-  "scripts": {
-    "build": "hawkts-switch"
-  }
-}
-```
-
-### 3. Add to .gitignore
-
-```
-.hawkts-temp
-```
-
-## Usage
-
-Create files with `.hts` extension:
+### 1. Create `.hts` files
 
 ```typescript
 // src/sounds.hts
@@ -65,13 +36,73 @@ export function getSound(animal: string): string {
 }
 ```
 
-Build to transform `.hts` → `.ts` → `.js`:
+### 2. Build
 
 ```bash
-npx hawkts-switch
+npx hawkts
 ```
 
-## Syntax
+### 3. Output
+
+```javascript
+// dist/sounds.js
+switch (animal) {
+  case 'dog':
+  case 'puppy':
+    return 'bark';
+    break;
+  // ...
+}
+```
+
+## VSCode Extension
+
+Install syntax highlighting for `.hts` files:
+
+```bash
+cd node_modules/hawkts/vscode-extension
+npx vsce package
+# Install the generated .vsix in VSCode
+```
+
+## CLI Options
+
+```
+hawkts [options]
+
+Options:
+  --src <dir>         Source directory (default: src)
+  --out <dir>         Output directory (default: dist)
+  -p, --project       Path to tsconfig.json (default: tsconfig.json)
+  --features <list>   Enable specific features (default: all)
+  -h, --help          Show help
+  -v, --version       Show version
+
+Examples:
+  hawkts
+  hawkts --src ./source --out ./build
+  hawkts --features switch
+```
+
+## Configuration
+
+### package.json
+
+```json
+{
+  "scripts": {
+    "build": "hawkts"
+  }
+}
+```
+
+### .gitignore
+
+```
+.hawkts-temp
+```
+
+## Syntax Reference
 
 ### Multi-value Cases
 
@@ -83,46 +114,15 @@ switch (animal) {
 }
 ```
 
-Compiles to:
-
-```javascript
-switch (animal) {
-  case 'dog':
-  case 'puppy':
-    console.log('barks');
-    break;
-  case 'cat':
-  case 'kitten':
-    console.log('meows');
-    break;
-  default:
-    console.log('silence');
-}
-```
-
-### Fall-through with `:>`
-
-Use `:>` instead of `:` to fall through to the next case:
+### Fall-through (`:>`)
 
 ```typescript
 switch (count) {
-  0:> output += "Zero ";
-  1:> output += "One ";
-  2: console.log(output + "Two");
-  default: console.log("Other");
+  3:> result += 'Three... ';
+  2:> result += 'Two... ';
+  1:> result += 'One... ';
+  0: result += 'Liftoff!';
 }
-```
-
-## CLI Options
-
-```
-hawkts-switch [options]
-
-Options:
-  --src <dir>       Source directory (default: src)
-  --out <dir>       Output directory (default: dist)
-  -p, --project     Path to tsconfig.json (default: tsconfig.json)
-  -h, --help        Show help
 ```
 
 ## File Extensions
@@ -130,37 +130,63 @@ Options:
 | Extension | Description |
 |-----------|-------------|
 | `.hts`    | Hawk TypeScript |
-| `.htsx`   | Hawk TSX (for React) |
-| `.ts`     | Standard TypeScript (copied as-is) |
+| `.htsx`   | Hawk TSX (React) |
+| `.ts`     | Standard TypeScript (copied) |
 
-## How It Works
+## Programmatic API
+
+```typescript
+import { transform } from 'hawkts';
+
+const input = `
+switch (x) {
+  1, 2, 3: console.log('low');
+  default: console.log('high');
+}
+`;
+
+const output = transform(input);
+// output is valid TypeScript
+```
+
+### Selective Features
+
+```typescript
+import { transform } from 'hawkts';
+
+const output = transform(input, {
+  features: {
+    switch: true,
+    // pipe: false,
+  }
+});
+```
+
+## Architecture
 
 ```
-src/
-  utils.ts        ← Standard TypeScript (copied)
-  handler.hts     ← Hawk TypeScript (transformed)
-       ↓
-   hawkts-switch build
-       ↓
-.hawkts-temp/     ← Temporary (auto-cleaned)
-  utils.ts
-  handler.ts      ← Transformed to standard TS
-       ↓
-   tsc
-       ↓
-dist/
-  utils.js
-  handler.js
+hawkts/
+├── src/
+│   ├── core/
+│   │   ├── types.ts        # Transform interface
+│   │   └── transformer.ts  # Orchestrator
+│   ├── transforms/
+│   │   ├── switch.ts       # Switch transform
+│   │   └── index.ts        # All transforms
+│   └── index.ts            # Main exports
+├── bin/
+│   └── hawkts.js           # CLI
+└── vscode-extension/       # Syntax highlighting
 ```
 
 ## Background
 
-Here is a post explaining why I decided to try and write this code:
+Blog post about the motivation:
 [zenn.dev/theblindhawk](https://zenn.dev/theblindhawk/articles/f3633b0524fb91)
 
 ## Contributing
 
-Issues and pull requests welcome at [GitHub](https://github.com/TheBlindHawk/JS-switch).
+Issues and PRs welcome at [GitHub](https://github.com/TheBlindHawk/hawkts).
 
 ## License
 
