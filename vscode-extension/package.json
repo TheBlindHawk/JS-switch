@@ -1,0 +1,46 @@
+{
+  "name": "hawkts-switch",
+  "displayName": "Hawk TypeScript",
+  "description": "Language support for .hts files - TypeScript with enhanced switch syntax",
+  "version": "1.0.0",
+  "publisher": "theblindhawk",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "hts",
+        "aliases": ["Hawk TypeScript", "hts"],
+        "extensions": [".hts"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "htsx",
+        "aliases": ["Hawk TSX", "htsx"],
+        "extensions": [".htsx"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "hts",
+        "scopeName": "source.hts",
+        "path": "./syntaxes/hts.tmLanguage.json"
+      },
+      {
+        "language": "htsx",
+        "scopeName": "source.htsx",
+        "path": "./syntaxes/htsx.tmLanguage.json"
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TheBlindHawk/JS-switch"
+  },
+  "license": "MIT"
+}

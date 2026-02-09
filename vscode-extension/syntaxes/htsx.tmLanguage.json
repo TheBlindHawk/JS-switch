@@ -1,0 +1,106 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Hawk TSX",
+  "scopeName": "source.htsx",
+  "patterns": [
+    { "include": "#hawk-switch" },
+    { "include": "source.tsx" }
+  ],
+  "repository": {
+    "hawk-switch": {
+      "patterns": [
+        { "include": "#hawk-switch-block" }
+      ]
+    },
+    "hawk-switch-block": {
+      "begin": "\\b(switch)\\s*\\(",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.switch.htsx" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.block.htsx" }
+      },
+      "patterns": [
+        { "include": "#switch-expression" },
+        { "include": "#switch-body" }
+      ]
+    },
+    "switch-expression": {
+      "begin": "\\(",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.expression.begin.htsx" }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.expression.end.htsx" }
+      },
+      "patterns": [
+        { "include": "source.tsx" }
+      ]
+    },
+    "switch-body": {
+      "begin": "\\{",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.block.htsx" }
+      },
+      "end": "(?=\\})",
+      "patterns": [
+        { "include": "#hawk-case" },
+        { "include": "#hawk-default" },
+        { "include": "#standard-case" },
+        { "include": "source.tsx" }
+      ]
+    },
+    "hawk-case": {
+      "comment": "Custom case: 'value', 'value2': or 'value':>",
+      "match": "^\\s*((?:(?:'[^']*'|\"[^\"]*\"|`[^`]*`|\\d+)\\s*,\\s*)*(?:'[^']*'|\"[^\"]*\"|`[^`]*`|\\d+))\\s*(:>?)",
+      "captures": {
+        "1": {
+          "patterns": [
+            {
+              "match": "'[^']*'",
+              "name": "string.quoted.single.htsx"
+            },
+            {
+              "match": "\"[^\"]*\"",
+              "name": "string.quoted.double.htsx"
+            },
+            {
+              "match": "`[^`]*`",
+              "name": "string.template.htsx"
+            },
+            {
+              "match": "\\d+",
+              "name": "constant.numeric.htsx"
+            },
+            {
+              "match": ",",
+              "name": "punctuation.separator.comma.htsx"
+            }
+          ]
+        },
+        "2": { "name": "keyword.operator.case.htsx" }
+      }
+    },
+    "hawk-default": {
+      "match": "\\b(default)\\s*(:)",
+      "captures": {
+        "1": { "name": "keyword.control.default.htsx" },
+        "2": { "name": "keyword.operator.case.htsx" }
+      }
+    },
+    "standard-case": {
+      "match": "\\b(case)\\s+(.+?)\\s*(:>?)",
+      "captures": {
+        "1": { "name": "keyword.control.case.htsx" },
+        "2": {
+          "patterns": [
+            { "include": "source.tsx" }
+          ]
+        },
+        "3": { "name": "keyword.operator.case.htsx" }
+      }
+    }
+  }
+}

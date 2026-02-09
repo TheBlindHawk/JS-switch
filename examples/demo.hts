@@ -1,0 +1,27 @@
+/**
+ * Demo of Hawk TypeScript (.hts) syntax
+ */
+
+export function getAnimalSound(animal: string): string {
+  switch (animal) {
+    'dog', 'puppy': return 'bark';
+    'cat', 'kitten': return 'meow';
+    'wolf': return 'howl';
+    'fox': return 'yap';
+    default: return 'silence';
+  }
+}
+
+export function countdown(n: number): string {
+  let result = '';
+
+  switch (n) {
+    3:> result += 'Three... ';
+    2:> result += 'Two... ';
+    1:> result += 'One... ';
+    0: result += 'Liftoff!';
+    default: result = 'Invalid countdown';
+  }
+
+  return result;
+}

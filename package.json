@@ -1,44 +1,70 @@
 {
-  "name": "@theblindhawk/js-switch",
+  "name": "hawkts-switch",
   "version": "1.0.0",
-  "description": "a custom switch-case compiler for javascript",
+  "description": "Hawk TypeScript (.hts) - Enhanced switch syntax with multi-value cases and auto-break",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "hawkts-switch": "./bin/hawkts-switch.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./transformer": {
+      "types": "./dist/transformer.d.ts",
+      "default": "./dist/transformer.js"
+    },
+    "./ts-plugin": {
+      "types": "./ts-plugin/dist/index.d.ts",
+      "default": "./ts-plugin/dist/index.js"
+    }
+  },
   "files": [
-    "dist/"
+    "dist/",
+    "bin/",
+    "ts-plugin/dist/",
+    "vscode-extension/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build:grammar": "pegjs -o src/parser-generated.js src/grammar.pegjs",
+    "build:plugin": "tsc -p ts-plugin/tsconfig.json",
+    "build:ts": "ts-node scripts/build.ts",
+    "build": "npm run build:plugin && npm run build:grammar && npm run build:ts",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "typescript",
+    "switch",
+    "pattern-matching",
+    "hts",
+    "hawk-typescript",
+    "multi-case",
+    "syntax-extension"
   ],
   "devDependencies": {
-    "@babel/preset-env": "^7.19.4",
-    "@types/node": "^20.4.7",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^3.0.1"
+    "@types/node": "^20.0.0",
+    "pegjs": "^0.10.0",
+    "typescript": "^5.3.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "ts-node": "^10.9.0"
   },
-  "scripts": {
-    "fix": "run-s fix:*",
-    "fix:prettier": "prettier -w",
-    "fix:eslint": "npm run lint:eslint --fix",
-    "build": "pegjs -o dist/index.js src/index.pegjs"
-  },
+"author": "TheBlindHawk",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TheBlindHawk/JS-switch.git"
   },
-  "keywords": [
-    "switch-case",
-    "switch",
-    "compiler"
-  ],
-  "author": "TheBlindHawk",
-  "license": "ISC",
-  "babel": {
-    "presets": [
-      "@babel/preset-env"
-    ]
-  },
   "bugs": {
-    "url": "https://github.com/TheBlindHawk/Roulette/issues"
+    "url": "https://github.com/TheBlindHawk/JS-switch/issues"
   },
-  "homepage": "https://github.com/TheBlindHawk/Roulette#readme",
+  "homepage": "https://github.com/TheBlindHawk/JS-switch#readme",
   "dependencies": {
     "pegjs": "^0.10.0"
   }
